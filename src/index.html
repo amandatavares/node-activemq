@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Chat Server</title>
+	<link rel="stylesheet" type="text/css" href="server.css">
+	<script type="text/javascript">
+		// Initialize WebSocket connection
+		var socket = new WebSocket("ws://localhost:8080");
+
+		// Handle WebSocket messages
+		socket.onmessage = function(event) {
+			var message = JSON.parse(event.data);
+
+			switch (message.type) {
+				case "users":
+					updateUserList(message.data);
+					break;
+				case "messages":
+					addMessage(message.data);
+					break;
+				case "topics":
+					updateTopicList(message.data);
+					break;
+				default:
+					console.error("Invalid message type:", message.type);
+			}
+		};
+
+		// Send message to WebSocket server
+		function sendMessage(message) {
+			socket.send(JSON.stringify(message));
+		}
+
+		// Update user list
+		function updateUserList(users) {
+			var userList = document.getElementById("userList");
+			userList.innerHTML = "";
+
+			for (var i = 0; i < users.length; i++) {
+				var user = users[i];
+				var li = document.createElement("li");
+				li.textContent = user;
+				userList.appendChild(li);
+			}
+		}
+
+		// Add message to chat log
+		function addMessage(message) {
+			var chatLog = document.getElementById("chatLog");
+			var li = document.createElement("li");
+			li.textContent = message;
+			chatLog.appendChild(li);
+		}
+
+		// Update topic list
+		function updateTopicList(topics) {
+			var topicList = document.getElementById("topicList");
+			topicList.innerHTML = "";
+
+			for (var i = 0; i < topics.length; i++) {
+				var topic = topics[i];
+				var option = document.createElement("option");
+				option.value = topic;
+				option.textContent = topic;
+				topicList.appendChild(option);
+			}
+		}
+
+		// Send message to join a topic
+		function joinTopic() {
+			var topicList = document.getElementById("topicList");
+			var topic = topicList.value;
+
+			if (topic) {
+				sendMessage({ type: "join_topic", data: topic });
+			}
+		}
+
+		// Send message to create a topic
+		function createTopic() {
+			var topicInput = document.getElementById("topicInput");
+			var topic = topicInput.value.trim();
+
+			if (topic) {
+				sendMessage({ type: "create_topic", data: topic });
+				topicInput.value = "";
+			}
+		}
+
+		// Send message to delete a topic
+		function deleteTopic() {
+			var topicList = document.getElementById("topicList");
+			var topic = topicList.value;
+
+			if (topic) {
+				sendMessage({ type: "delete_topic", data: topic });
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div id="header">
+		<h1>Chat Server</h1>
+	</div>
+	<div id="content">
+		<div id="sidebar">
+			<h2>Topics</h2>
+			<select id="topicList"></select>
+			<button onclick="joinTopic()">Join</button>
+			<br><br>
+			<input type="text" id="topicInput" placeholder="Enter topic name">
+			<button onclick="createTopic()">Create</button>
+			<button onclick="deleteTopic()">Delete</button>
+			<br><br>
+			<h2>Users</h2>
+			<ul id="userList"></ul>
+			<button onclick="refreshUserList()">Refresh</button>
+		</div>
+		<div id="chat">
+			<div id="messages"></div>
+			<br>
+			<input type="text" id="messageInput" placeholder="Enter message">
+			<button onclick="sendMessage()">Send</button>
+			<button onclick="leaveTopic()">Leave</button>
+		</div>
+	</div>
