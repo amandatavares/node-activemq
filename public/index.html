@@ -108,8 +108,9 @@
 		<div id="sidebar">
 			<h2>Topics</h2>
 			<select id="topicList"></select>
-			<button onclick="joinTopic()">Join</button>
+			<!-- <button onclick="joinTopic()">Join</button> -->
 			<br><br>
+			<h3>Create a topic</h3>
 			<input type="text" id="topicInput" placeholder="Enter topic name">
 			<button onclick="createTopic()">Create</button>
 			<button onclick="deleteTopic()">Delete</button>
@@ -117,12 +118,14 @@
 			<h2>Users</h2>
 			<ul id="userList"></ul>
 			<button onclick="refreshUserList()">Refresh</button>
+			<button onclick="window.open('client.html','_blank')" id="newClient" class="btn request-callback" >Create client </button>
+
 		</div>
-		<div id="chat">
+		<!-- <div id="chat">
 			<div id="messages"></div>
 			<br>
 			<input type="text" id="messageInput" placeholder="Enter message">
 			<button onclick="sendMessage()">Send</button>
 			<button onclick="leaveTopic()">Leave</button>
-		</div>
+		</div> -->
 	</div>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat App</title>
+    <link rel="stylesheet" type="text/css" href="/client.css">
+    <script type="text/javascript">
+        const socket = new WebSocket('ws://localhost:3000');
+
+        const sendBtn = document.getElementById('sendBtn');
+        const messageInput = document.getElementById('messageInput');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const topicInput = document.getElementById('topicInput');
+        const subscribeBtn = document.getElementById('subscribeBtn');
+
+        let nickname;
+
+        socket.addEventListener('open', () => {
+        console.log('WebSocket connection established.');
+
+        // Prompt user to enter a nickname
+        nickname = prompt('Enter a nickname:');
+        socket.send(JSON.stringify({ type: 'register', nickname }));
+        });
+
+        socket.addEventListener('message', (event) => {
+        const message = JSON.parse(event.data);
+
+        switch (message.type) {
+            case 'message':
+            addMessage(message.senderNickname, message.message);
+            break;
+
+            case 'topicMessage':
+            addMessage(`[${message.topic}] ${message.senderNickname}`, message.message);
+            break;
+
+            default:
+            console.error(`Received invalid message type: ${message.type}`);
+        }
+        });
+
+        sendBtn.addEventListener('click', () => {
+        const recipient = messageInput.getAttribute('data-recipient');
+        const topic = messageInput.getAttribute('data-topic');
+        const message = messageInput.value;
+
+        if (recipient) {
+            // Send message to recipient
+            socket.send(JSON.stringify({ type: 'send', senderNickname: nickname, recipientNickname: recipient, message }));
+            addMessage(`To ${recipient}`, message);
+        } else if (topic) {
+            // Send message to topic
+            socket.send(JSON.stringify({ type: 'sendTopic', senderNickname: nickname, topic, message }));
+            addMessage(`[${topic}]`, message);
+        } else {
+            console.error('No recipient or topic specified.');
+        }
+
+        messageInput.value = '';
+        });
+
+        subscribeBtn.addEventListener('click', () => {
+        const topic = topicInput.value;
+        socket.send(JSON.stringify({ type: 'subscribe', nickname, topic }));
+        addMessage(`Subscribed to ${topic}`);
+        });
+
+        function addMessage(sender, message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message';
+        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        messagesContainer.appendChild(messageElement);
+        }
+    </script>
+  </head>
+  <body>
+    <h1>Welcome to the Chat App</h1>
+    
+    <div id="topics">
+      <h2>Topics</h2>
+      <ul id="topics-list"></ul>
+      <form id="subscribe-form">
+        <label for="topic-input">Subscribe to topic:</label>
+        <input type="text" id="topic-input" name="topic">
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+    
+    <div id="users">
+      <h2>Users</h2>
+      <ul id="users-list"></ul>
+      <form id="send-form">
+        <label for="recipient-input">Send message to:</label>
+        <input type="text" id="recipient-input" name="recipient">
+        <label for="message-input">Message:</label>
+        <input type="text" id="message-input" name="message">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+    
+    <script type="text/javascript" src="/client.js"></script>
+  </body>
+</html>

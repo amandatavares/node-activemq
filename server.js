@@ -6,11 +6,13 @@ const stompit = require('stompit');
 const client = require('./client');
 
 const app = express();
+app.use(express.static('public')); // Serve static files from the "public" folder
+
 const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 const connectOptions = {
   host: 'localhost',
@@ -64,7 +66,7 @@ app.get('/', (req, res) => {
     'content-type': 'text/plain'
   };
 
-  res.sendFile(path.join(__dirname, 'src/index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 
   stompit.connect(connectOptions, function(error, client) {
     if (error) {

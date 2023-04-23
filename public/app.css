@@ -67,3 +67,57 @@ h1 {
     background-color: #c82333;
   }
   
+  #topics, #users {
+    width: 50%;
+    float: left;
+    padding: 20px;
+  }
+  
+  #topics {
+    background-color: #eee;
+  }
+  
+  #topics-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #topics-list li {
+    margin-bottom: 10px;
+  }
+  
+  #subscribe-form {
+    margin-top: 10px;
+  }
+  
+  #users {
+    background-color: #ccc;
+  }
+  
+  #users-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #users-list li {
+    margin-bottom: 10px;
+  }
+  
+  #send-form {
+    margin-top: 10px;
+  }
+  
+  label {
+    display: inline-block;
+    width: 100px;
+  }
+  
+  input[type="text"] {
+    width: 200px;
+  }
+  
+  button[type="submit"] {
+    margin-left: 10px;
+  }
