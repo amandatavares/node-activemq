@@ -1,22 +1,12 @@
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-  }
-  
-  h1 {
-    background-color: #008CBA;
-    color: white;
-    margin: 0;
-    padding: 20px;
+h1 {
+    font-size: 32px;
     text-align: center;
   }
   
   form {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
     margin-top: 20px;
+    display: flex;
+    justify-content: center;
   }
   
   label {
@@ -24,17 +14,56 @@ body {
   }
   
   input[type="text"] {
+    width: 200px;
     padding: 5px;
     border-radius: 5px;
-    border: 1px solid gray;
-    margin-right: 10px;
+    border: 1px solid #ccc;
   }
   
   button[type="submit"] {
-    padding: 5px;
+    padding: 5px 10px;
     border-radius: 5px;
     border: none;
-    background-color: #008CBA;
-    color: white;
+    background-color: #007bff;
+    color: #fff;
     cursor: pointer;
   }
+  
+  button[type="submit"]:hover {
+    background-color: #0062cc;
+  }
+  
+  #client-list, #queue-list, #topic-list {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .client, .queue, .topic {
+    width: 200px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .client p, .queue p, .topic p {
+    margin: 0;
+  }
+  
+  .client button, .queue button, .topic button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #dc3545;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  .client button:hover, .queue button:hover, .topic button:hover {
+    background-color: #c82333;
+  }
+  
