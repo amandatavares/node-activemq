@@ -92,6 +92,58 @@ app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
 });
 
+// Get all clients
+app.get('/clients', (req, res) => {
+  const clientList = [];
+
+  clients.forEach((client, nickname) => {
+    const queueSize = client.client.active ? client.client.active : 0;
+    clientList.push({ nickname, queueName: client.queueName, queueSize });
+  });
+
+  res.status(200).json(clientList);
+});
+
+ // Create a new client with a unique nickname
+ app.post('/client', (req, res) => {
+  const { nickname } = req.body;
+
+  if (!nickname || typeof nickname !== 'string') {
+    res.status(400).send('Nickname must be a non-empty string.');
+    return;
+  }
+
+  if (clients.has(nickname)) {
+    res.status(409).send('Nickname already in use. Please choose another nickname.');
+    return;
+  }
+
+  stompit.connect(connectOptions, (error, client) => {
+    if (error) {
+      console.log('Failed to connect:', error.message);
+      res.status(500).send('Failed to connect to ActiveMQ broker.');
+      return;
+    }
+
+    const queueName = `${nickname}-queue`;
+
+    client.subscribe({ destination: queueName, ack: 'client-individual' }, (error, message) => {
+      if (error) {
+        console.log('Failed to subscribe:', error.message);
+        res.status(500).send('Failed to create client.');
+        return;
+      }
+
+      console.log(`Client ${nickname} has been created.`);
+
+      const newClient = { nickname, queueName, client };
+      clients.set(nickname, newClient);
+
+      res.status(200).send(`Client ${nickname} has been created.`);
+    });
+  });
+});
+
 app.post('/queue', (req, res) => {
     const queueName = req.body.name;
 
@@ -230,6 +282,42 @@ app.delete('/queue/:name', (req, res) => {
       });
     });
   });
+
+  // List all topics
+app.get('/topics', (req, res) => {
+  stompit.connect(connectOptions, (error, client) => {
+    if (error) {
+      console.log('Failed to connect:', error.message);
+      res.status(500).send('Failed to connect to ActiveMQ broker.');
+      return;
+    }
+
+    const headers = {
+      destination: '/topic',
+      ack: 'auto'
+    };
+
+    client.subscribe(headers, (error, message) => {
+      if (error) {
+        console.log('Failed to subscribe:', error.message);
+        res.status(500).send('Failed to list topics.');
+        return;
+      }
+
+      const topics = [];
+
+      message.on('data', (data) => {
+        const topicName = data.toString();
+        topics.push(topicName);
+      });
+
+      message.on('end', () => {
+        console.log('Topics:', topics);
+        res.status(200).json(topics);
+      });
+    });
+  });
+});
 
 // Add a topic
 app.post('/topic/:name', (req, res) => {

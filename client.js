@@ -31,45 +31,7 @@ const amqConnectionPool = new stompit.ConnectFailover([
   'connectTimeout': 3000
 });
 
- // Create a new client with a unique nickname
- app.post('/client', (req, res) => {
-    const { nickname } = req.body;
-  
-    if (!nickname || typeof nickname !== 'string') {
-      res.status(400).send('Nickname must be a non-empty string.');
-      return;
-    }
-  
-    if (clients.has(nickname)) {
-      res.status(409).send('Nickname already in use. Please choose another nickname.');
-      return;
-    }
-  
-    stompit.connect(connectOptions, (error, client) => {
-      if (error) {
-        console.log('Failed to connect:', error.message);
-        res.status(500).send('Failed to connect to ActiveMQ broker.');
-        return;
-      }
-  
-      const queueName = `${nickname}-queue`;
-  
-      client.subscribe({ destination: queueName, ack: 'client-individual' }, (error, message) => {
-        if (error) {
-          console.log('Failed to subscribe:', error.message);
-          res.status(500).send('Failed to create client.');
-          return;
-        }
-  
-        console.log(`Client ${nickname} has been created.`);
-  
-        const newClient = { nickname, queueName, client };
-        clients.set(nickname, newClient);
-  
-        res.status(200).send(`Client ${nickname} has been created.`);
-      });
-    });
-  });
+
 
 // Subscribe a client to a topic
 app.post('/client/:nickname/subscribe', (req, res) => {

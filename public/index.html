@@ -4,128 +4,63 @@
 	<meta charset="utf-8">
 	<title>Chat Server</title>
 	<link rel="stylesheet" type="text/css" href="server.css">
-	<script type="text/javascript">
-		// Initialize WebSocket connection
-		var socket = new WebSocket("ws://localhost:8080");
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 
-		// Handle WebSocket messages
-		socket.onmessage = function(event) {
-			var message = JSON.parse(event.data);
+	<!-- Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="app.js"></script>
 
-			switch (message.type) {
-				case "users":
-					updateUserList(message.data);
-					break;
-				case "messages":
-					addMessage(message.data);
-					break;
-				case "topics":
-					updateTopicList(message.data);
-					break;
-				default:
-					console.error("Invalid message type:", message.type);
-			}
-		};
-
-		// Send message to WebSocket server
-		function sendMessage(message) {
-			socket.send(JSON.stringify(message));
-		}
-
-		// Update user list
-		function updateUserList(users) {
-			var userList = document.getElementById("userList");
-			userList.innerHTML = "";
-
-			for (var i = 0; i < users.length; i++) {
-				var user = users[i];
-				var li = document.createElement("li");
-				li.textContent = user;
-				userList.appendChild(li);
-			}
-		}
-
-		// Add message to chat log
-		function addMessage(message) {
-			var chatLog = document.getElementById("chatLog");
-			var li = document.createElement("li");
-			li.textContent = message;
-			chatLog.appendChild(li);
-		}
-
-		// Update topic list
-		function updateTopicList(topics) {
-			var topicList = document.getElementById("topicList");
-			topicList.innerHTML = "";
-
-			for (var i = 0; i < topics.length; i++) {
-				var topic = topics[i];
-				var option = document.createElement("option");
-				option.value = topic;
-				option.textContent = topic;
-				topicList.appendChild(option);
-			}
-		}
-
-		// Send message to join a topic
-		function joinTopic() {
-			var topicList = document.getElementById("topicList");
-			var topic = topicList.value;
-
-			if (topic) {
-				sendMessage({ type: "join_topic", data: topic });
-			}
-		}
-
-		// Send message to create a topic
-		function createTopic() {
-			var topicInput = document.getElementById("topicInput");
-			var topic = topicInput.value.trim();
-
-			if (topic) {
-				sendMessage({ type: "create_topic", data: topic });
-				topicInput.value = "";
-			}
-		}
-
-		// Send message to delete a topic
-		function deleteTopic() {
-			var topicList = document.getElementById("topicList");
-			var topic = topicList.value;
-
-			if (topic) {
-				sendMessage({ type: "delete_topic", data: topic });
-			}
-		}
-	</script>
 </head>
 
 <body>
-	<div id="header">
-		<h1>Chat Server</h1>
-	</div>
-	<div id="content">
-		<div id="sidebar">
-			<h2>Topics</h2>
-			<select id="topicList"></select>
-			<!-- <button onclick="joinTopic()">Join</button> -->
-			<br><br>
-			<h3>Create a topic</h3>
-			<input type="text" id="topicInput" placeholder="Enter topic name">
-			<button onclick="createTopic()">Create</button>
-			<button onclick="deleteTopic()">Delete</button>
-			<br><br>
-			<h2>Users</h2>
-			<ul id="userList"></ul>
-			<button onclick="refreshUserList()">Refresh</button>
-			<button onclick="window.open('client.html','_blank')" id="newClient" class="btn request-callback" >Create client </button>
-
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h1>Message Broker App</h1>
+			</div>
+			<div class="col-md-6">
+				<form class="form-inline" id="message-form">
+					<div class="form-group">
+						<label for="topic">Topic:</label>
+						<input class="form-control" type="text" id="topic" name="topic" required>
+						<button class="btn btn-primary" type="submit">Send</button>
+					</div>
+				</form>
+				<br>
+				<button class="btn btn-default" id="list-button">List topics</button>
+				<button class="btn btn-danger" id="delete-button">Delete topics</button>
+				
+			</div>
+			<div class="col-md-6">
+				<ul id="topics-list"></ul>
+		
+				<br><br>
+			</div>
 		</div>
-		<!-- <div id="chat">
-			<div id="messages"></div>
-			<br>
-			<input type="text" id="messageInput" placeholder="Enter message">
-			<button onclick="sendMessage()">Send</button>
-			<button onclick="leaveTopic()">Leave</button>
-		</div> -->
+		<br>
+		<h1>Message Broker Client Management</h1>
+	
+		<h2>Create Client</h2>
+		<form>
+			<label for="clientName">Client Name:</label>
+			<input type="text" id="clientName" name="clientName">
+			<button class="btn btn-default" type="button" onclick="createClient()">Create</button>
+		</form>
+		
+		<h2>View Clients</h2>
+		<button type="button" class="btn btn-default" onclick="getAllClients()">Refresh</button>
+		<ul id="client-list"></ul>
+		
+		<h2>Delete Client</h2>
+		<form>
+			<label for="deleteClient">Client Name:</label>
+			<select id="deleteClient" name="deleteClient"></select>
+			<button type="button" class="btn btn-default" onclick="deleteClient()">Delete</button>
+		</form>
+		
 	</div>
+
+  </body>
